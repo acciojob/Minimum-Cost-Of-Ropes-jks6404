@@ -1,22 +1,50 @@
-function calculateMinCost(ropeLengths) {
-  //your code here
-  let cost = 0;
-  let sortedLengths = ropeLengths.sort((a, b) => a - b); // sort the rope lengths in ascending order
+const input = document.querySelector('input[type="text"]');
+const resultDiv = document.querySelector('#result');
+
+input.addEventListener('change', () => {
+  const lengths = input.value;
+  const cost = minCostOfRopes(lengths);
+  resultDiv.textContent = cost;
+});
+
+function minCostOfRopes(lengths) {
+  // Convert the input string to an array of integers
+  const ropes = lengths.split(',').map(str => parseInt(str.trim()));
   
-  while (sortedLengths.length > 1) {
-    // take the two smallest ropes
-    let smallestRope = sortedLengths.shift();
-    let secondSmallestRope = sortedLengths.shift();
-    
-    // add their lengths and insert the new rope back into the array
-    let newRopeLength = smallestRope + secondSmallestRope;
-    cost += newRopeLength;
-    sortedLengths.push(newRopeLength);
-    sortedLengths.sort((a, b) => a - b); // re-sort the array
+  // Initialize a priority queue with the lengths of the ropes
+  const pq = new PriorityQueue();
+  ropes.forEach(len => pq.enqueue(len));
+  
+  // Merge ropes until only one remains in the queue
+  let cost = 0;
+  while (pq.size() > 1) {
+    const len1 = pq.dequeue();
+    const len2 = pq.dequeue();
+    const mergedLen = len1 + len2;
+    cost += mergedLen;
+    pq.enqueue(mergedLen);
   }
   
+  // Return the total cost of merging the ropes
   return cost;
+}
+
+// A simple priority queue implementation using an array
+class PriorityQueue {
+  constructor() {
+    this.queue = [];
+  }
   
+  enqueue(item) {
+    this.queue.push(item);
+    this.queue.sort((a, b) => b - a);
+  }
   
+  dequeue() {
+    return this.queue.pop();
+  }
   
-}  
+  size() {
+    return this.queue.length;
+  }
+}
