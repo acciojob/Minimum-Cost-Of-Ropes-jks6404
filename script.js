@@ -1,50 +1,45 @@
-const input = document.querySelector('input[type="text"]');
-const resultDiv = document.querySelector('#result');
+function calculateMinCost() {
+  const str = document.querySelector('#rope-lengths').value;
+  const strArr = str.split(',');
+  const arr = strArr.map(e => Number.parseInt(e));
 
-input.addEventListener('change', () => {
-  const lengths = input.value;
-  const cost = minCostOfRopes(lengths);
-  resultDiv.textContent = cost;
-});
+  let n = arr.length;
 
-function minCostOfRopes(lengths) {
-  // Convert the input string to an array of integers
-  const ropes = lengths.split(',').map(str => parseInt(str.trim()));
-  
-  // Initialize a priority queue with the lengths of the ropes
-  const pq = new PriorityQueue();
-  ropes.forEach(len => pq.enqueue(len));
-  
-  // Merge ropes until only one remains in the queue
-  let cost = 0;
-  while (pq.size() > 1) {
-    const len1 = pq.dequeue();
-    const len2 = pq.dequeue();
-    const mergedLen = len1 + len2;
-    cost += mergedLen;
-    pq.enqueue(mergedLen);
-  }
-  
-  // Return the total cost of merging the ropes
-  return cost;
+  let ans = helper(arr, n);
+  document.querySelector('#result').innerText = ans;
 }
 
-// A simple priority queue implementation using an array
-class PriorityQueue {
-  constructor() {
-    this.queue = [];
+function helper(arr, n) {
+  // Create a priority queue
+  let pq = [];
+
+  // Adding items to the pQueue
+  for (let i = 0; i < n; i++) {
+    pq.push(arr[i]);
   }
-  
-  enqueue(item) {
-    this.queue.push(item);
-    this.queue.sort((a, b) => b - a);
+
+  pq.sort(function(a, b) {
+    return a - b;
+  });
+
+  // Initialize result
+  let res = 0;
+
+  // While size of priority queue
+  // is more than 1
+  while (pq.length > 1) {
+    // Extract shortest two ropes from pq
+    let first = pq.shift();
+    let second = pq.shift();
+
+    // Connect the ropes: update result
+    // and insert the new rope to pq
+    res += first + second;
+    pq.push(first + second);
+
+    pq.sort(function(a, b) {
+      return a - b;
+    });
   }
-  
-  dequeue() {
-    return this.queue.pop();
-  }
-  
-  size() {
-    return this.queue.length;
-  }
+  return res;
 }
